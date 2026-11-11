@@ -54,3 +54,10 @@ Clears all counters and the since-flush counter. Does not call `onFlush`.
 - `flush()` on an empty counter returns `null` rather than emitting a zero-valued metric, so downstream aggregators do not receive empty pings.
 - Automatic flushing uses `>=` against the interval, so a single `dropMany` larger than the interval triggers exactly one flush for the whole batch.
 - `flushInterval: 0` and `flushInterval: Infinity` both disable automatic flushing; they are distinct only in intent.
+
+## Design notes
+
+The window stores values eagerly rather than keeping running aggregates. Running
+sums drift with floating point over long streams, and recomputing from a small
+buffer is cheap enough that the drift is not worth the speed.
+
